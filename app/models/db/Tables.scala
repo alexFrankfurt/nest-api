@@ -1,15 +1,15 @@
 package models.db
 
-// AUTO-GENERATED Slick data model [2017-02-02T12:10:21.689+03:00[Europe/Minsk]]
+// AUTO-GENERATED Slick data model [2017-02-02T12:38:31.994+03:00[Europe/Minsk]]
 
 /** Stand-alone Slick data model for immediate use */
 object Tables extends {
-  val profile = slick.driver.PostgresDriver
+  val profile = utils.db.TetraoPostgresDriver
 } with Tables
 
 /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
 trait Tables {
-  val profile: slick.driver.PostgresDriver
+  val profile: utils.db.TetraoPostgresDriver
   import profile.api._
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
