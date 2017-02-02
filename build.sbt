@@ -14,6 +14,7 @@ lazy val root = (project in file("."))
 	.settings(
 		libraryDependencies ++= Seq(
 			"com.typesafe.slick" %% "slick" % "3.1.1",
+			"com.typesafe.slick" %% "slick-codegen" % "3.1.1",
 			"com.github.tminglei" %% "slick-pg" % "0.14.3",
 			"com.github.tminglei" %% "slick-pg_date2" % "0.14.3",
 			"com.typesafe.play" %% "play-slick" % "2.0.2",
@@ -22,3 +23,5 @@ lazy val root = (project in file("."))
 		)
 	)
   .enablePlugins(PlayScala)
+
+addCommandAlias("tables", "run-main utils.db.SourceCodeGenerator")
