@@ -27,7 +27,7 @@ class RequestActor(ws: WSClient) extends Actor {
                            "listing_type" -> "buy",
                            "place_name" -> "brighton",
                            "version" -> "1.22").get().map {resp => resp.json}, 5 seconds)
-      sender() ! resp.toString()
+      sender() ! (resp \ "response").get.toString()
 
   }
 }
