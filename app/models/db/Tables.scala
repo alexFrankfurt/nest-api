@@ -1,6 +1,8 @@
 package models.db
 
-// AUTO-GENERATED Slick data model [2017-02-02T12:38:31.994+03:00[Europe/Minsk]]
+import play.api.libs.json._
+
+// AUTO-GENERATED Slick data model [2017-02-03T15:34:17.889+03:00[Europe/Minsk]]
 
 /** Stand-alone Slick data model for immediate use */
 object Tables extends {
@@ -92,4 +94,8 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Properties */
   lazy val Properties = new TableQuery(tag => new Properties(tag))
+
+  implicit val propertiesReads = Json.reads[PropertiesRow]
+  implicit val propertiesWrites = Json.writes[PropertiesRow]
+  implicit val propertiesFormat = Json.format[PropertiesRow]
 }

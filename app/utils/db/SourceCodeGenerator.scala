@@ -88,6 +88,8 @@ object SourceCodeGenerator extends App {
         s"""
 package ${pkg}
 
+import play.api.libs.json._
+
 // AUTO-GENERATED Slick data model [${java.time.ZonedDateTime.now()}]
 
 /** Stand-alone Slick data model for immediate use */
@@ -100,6 +102,10 @@ trait ${container}${parentType.map(t => s" extends $t").getOrElse("")} {
   val profile: $profile
   import profile.api._
   ${indent(code)}
+
+  implicit val propertiesReads = Json.reads[PropertiesRow]
+  implicit val propertiesWrites = Json.writes[PropertiesRow]
+  implicit val propertiesFormat = Json.format[PropertiesRow]
 }
               """.trim()
       }
