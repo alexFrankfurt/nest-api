@@ -1,0 +1,11 @@
+@(title: String)(content: Html)
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@title</title>
+    </head>
+    <body>
+        <section class="content">@content</section>
+        <script src="@routes.Assets.at("javascripts/main.js")"></script>
+    </body>
+</html>

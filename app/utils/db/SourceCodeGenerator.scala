@@ -89,6 +89,7 @@ object SourceCodeGenerator extends App {
 package ${pkg}
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 // AUTO-GENERATED Slick data model [${java.time.ZonedDateTime.now()}]
 
@@ -103,9 +104,28 @@ trait ${container}${parentType.map(t => s" extends $t").getOrElse("")} {
   import profile.api._
   ${indent(code)}
 
-  implicit val propertiesReads = Json.reads[PropertiesRow]
-  implicit val propertiesWrites = Json.writes[PropertiesRow]
-  implicit val propertiesFormat = Json.format[PropertiesRow]
+  def tr(g: Option[(Int, List[String], String, Int, String, Short)]): Option[(String, String, Int, String, Short)] =
+    g match {
+      case Some((_, k, t, p , pt, uid)) => Some(k.mkString(", "), t, p, pt, uid)
+      case None => None
+    }
+
+  implicit val customReads: Reads[PropertiesRow] = (
+    (__ \\ "id").read(1) and
+    (__ \\ "keywords").read[String].map(s => s.split(',').map(_.trim).toList) and
+    (__ \\ "title").read[String] and
+    (__ \\ "price").read[Int] and
+    (__ \\ "property_type").read[String] and
+   (__ \\ "updated_in_days").read[Short]
+   )(PropertiesRow.apply _)
+
+  implicit val customWrites: Writes[PropertiesRow] = (
+     (__ \\ "keywords").write[String] and
+     (__ \\ "title").write[String] and
+     (__ \\ "price").write[Int] and
+     (__ \\ "property_type").write[String] and
+     (__ \\ "updated_in_days").write[Short]
+   )(unlift(PropertiesRow.unapply _ andThen tr))
 }
               """.trim()
       }

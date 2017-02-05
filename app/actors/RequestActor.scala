@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor._
-import models.db.Tables.PropertiesRow
+//import models.db.Tables.PropertiesRow
 import play.api.libs.json.{JsArray, Json}
 import play.api.libs.ws.WSClient
 
@@ -30,9 +30,10 @@ class RequestActor(ws: WSClient) extends Actor {
                            "listing_type" -> "buy",
                            "place_name" -> "brighton",
                            "version" -> "1.22").get().map {resp => resp.json}, 5 seconds)
-      val lsgs = (resp \ "response" \ "listings").as[JsArray].value //.map(obj => Json.fromJson[PropertiesRow](obj))
+      val lsgs = (resp \ "response" \ "listings").as[JsArray].head.get //value.map(obj => Json.fromJson[PropertiesRow](obj))
       // write lsgs in database
-      sender() ! (lsgs).toString()
+//      val print1 = Json.prettyPrint(lsgs)
+//      sender() ! Json.fromJson[PropertiesRow](lsgs).toString
 
   }
 }
