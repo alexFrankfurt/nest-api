@@ -1,13 +1,13 @@
 let inputField = document.querySelector("#input-field")
 let ll = document.querySelector("#lookup-list")
 let resp = document.querySelector("#app-response")
-let but = document.querySelector("#add-button")
+let addButton = document.querySelector("#add-button")
 let sendButton = document.querySelector("#send")
 let cleanButton = document.querySelector("#clean")
 var sw = new Array()
 
 inputField.onkeyup = (e) => {
-   if (e.key == "Enter") but.click()
+   if (e.key == "Enter" && !e.ctrlKey) addButton.click()
 }
 
 cleanButton.onclick = () => {
@@ -16,7 +16,7 @@ cleanButton.onclick = () => {
     sw = new Array()
 }
 
-but.onclick = () => {
+addButton.onclick = () => {
     let ae = document.createElement("li")
     ae.innerText = inputField.value
     sw.push(inputField.value)
