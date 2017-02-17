@@ -1,59 +1,37 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
 import actors.RequestActor
-import actors.RequestActor.GetData
+import actors.RequestActor._
 import akka.actor.ActorSystem
-import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
 import akka.pattern.ask
 import akka.util.Timeout
-import models.db.Tables
-import models.db.Tables.{customReads, customWrites}
-import models.db.Tables.PropertiesRow
-import play.api.libs.functional.syntax
-import services.db.DBService
-import utils.db.TetraoPostgresDriver.api._
+import models.db.Tables.customReads
+import play.api.Logger
 import play.api.libs.json._
-import models.Key
-import play.twirl.api.Html
+import play.api.libs.ws.WSClient
+import play.api.mvc.{Action, Controller}
+import services.db.DBService
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 
-class Application @Inject() (ws: WSClient, system: ActorSystem, database: DBService) extends Controller{
+class Application @Inject() (ws: WSClient, system: ActorSystem, database: DBService) extends Controller {
 
   implicit val timeout = Timeout(5 seconds)
 
-  private val requestActor = system.actorOf(RequestActor.props(ws))
+  private val requestActor = system.actorOf(RequestActor.props(ws, database))
+
+  requestActor ! RequestNestoriaData
 
   def index() = Action {
-
-    val resp = Await.result(
-      ws.url("http://api.nestoria.co.uk/api")
-        .withQueryString("encoding" -> "json",
-          "action" -> "search_listings",
-          "country" -> "uk",
-          "listing_type" -> "buy",
-          "place_name" -> "brighton",
-          "version" -> "1.22").get().map {resp => resp.json}, 5 seconds)
-
-    val lsgs = (resp \ "response" \ "listings").as[JsArray].value
-    val data = lsgs.map(o => Json.fromJson[PropertiesRow](o.as[JsObject]))
-    val sdata = data.filter(_.isSuccess).map(_.get)
-    database.run(Tables.Properties.delete)
-    database.run((Tables.Properties returning Tables.Properties) ++= sdata)
-
     Ok(views.html.main("Nestoria api")(views.html.interactive()))
   }
 
-  def search() = Action(parse.json) { request =>
+  def search() = Action.async(parse.json) { request =>
     val queryData = (request.body \ "keywords").as[List[String]]
-    val response = database.run(Tables.Properties.filter(_.keywords @> queryData).result)
-    val r = Json.toJson(response)
-    Ok(r)
+    (requestActor ? LookForKeywords(queryData)).mapTo[JsValue].map(Ok(_))
   }
 }
