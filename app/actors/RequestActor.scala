@@ -8,10 +8,9 @@ import play.api.libs.json.JsObject
 import services.db.DBService
 import play.api.libs.json.{JsArray, Json}
 import play.api.libs.ws.WSClient
+import services.nestoria._
 import utils.db.TetraoPostgresDriver.api._
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
@@ -22,13 +21,12 @@ class RequestActor(ws: WSClient, database: DBService) extends Actor {
 
     case RequestNestoriaData =>
       Logger.info("Requesting data from Nestoria servers")
-      val request = ws.url("http://api.nestoria.co.uk/api")
-        .withQueryString("encoding" -> "json",
-          "action" -> "search_listings",
-          "country" -> "uk",
-          "listing_type" -> "buy",
-          "place_name" -> "brighton",
-          "version" -> "1.22").get()
+
+      val reqUrl = Nestoria(UK, SearchListings, pretty = true)
+          .withParams(ListingType("buy"))
+          .searchFor("brighton").url
+
+      val request = ws.url(reqUrl).get()
 
       request.onComplete {
         case Success(response) =>
