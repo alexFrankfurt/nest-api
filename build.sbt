@@ -12,10 +12,18 @@ lazy val root = (project in file("."))
 	.settings(commonSettings: _*)
 	.settings(routesGenerator := InjectedRoutesGenerator)
 	.settings(
-		libraryDependencies += "com.typesafe.slick" %% "slick" % "3.1.1",
-		libraryDependencies += "com.github.tminglei" %% "slick-pg" % "0.14.3",
-		libraryDependencies += "com.github.tminglei" %% "slick-pg_date2" % "0.14.3",
-		libraryDependencies += "com.typesafe.play" %% "play-slick" % "2.0.2",
-		libraryDependencies += play.sbt.Play.autoImport.cache
+		libraryDependencies ++= Seq(
+			"com.typesafe.slick" %% "slick" % "3.1.1",
+			"com.typesafe.slick" %% "slick-codegen" % "3.1.1",
+			"com.github.tminglei" %% "slick-pg" % "0.14.3",
+			"com.github.tminglei" %% "slick-pg_date2" % "0.14.3",
+			"com.typesafe.play" %% "play-slick" % "2.0.2",
+			"com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
+			play.sbt.Play.autoImport.cache,
+			play.sbt.Play.autoImport.ws,
+			specs2 % Test
+		)
 	)
   .enablePlugins(PlayScala)
+
+addCommandAlias("tables", "run-main utils.db.SourceCodeGenerator")
